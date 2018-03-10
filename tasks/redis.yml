@@ -1,0 +1,53 @@
+---
+- name: ensure redis storage dir
+  file:
+    dest: '{{ item }}'
+    state: directory
+  with_items:
+    - '{{ redis_data_dir }}'
+
+- name: ensure redis config dir
+  file:
+    dest: '{{ item }}'
+    state: directory
+  with_items:
+    - '{{ redis_config_dir }}'
+
+- name: create redis config file
+  template:
+    src: redis.conf.j2
+    dest: '{{ redis_config_dir }}/redis.conf'
+
+- name: run host configuration container
+  docker_container:
+    state: started
+    restart: yes
+    recreate: yes
+    name: redis-host-sys-flags
+    image: alpine
+    detach: no
+    interactive: no
+    privileged: true
+    volumes:
+      - /proc:/hostfs/proc
+      - /sys:/hostfs/sys
+    command: >
+      sh -c "echo 1 > /hostfs/proc/sys/vm/overcommit_memory &&
+             echo never > /hostfs/sys/kernel/mm/transparent_hugepage/enabled &&
+             echo never > /hostfs/sys/kernel/mm/transparent_hugepage/defrag"
+
+- name: run redis container
+  docker_container:
+    state: started
+    restart: yes
+    recreate: yes
+    name: '{{ redis_container_name }}'
+    image: redis:{{ redis_version }}
+    restart_policy: always
+    published_ports: '{{ redis_published_ports | default([]) }}'
+    sysctls:
+      net.core.somaxconn: '{{ redis_tcp_backlog }}'
+    volumes:
+      - '{{ redis_data_dir }}:/data'
+      - '{{ redis_config_dir }}/redis.conf:/usr/local/etc/redis/redis.conf'
+    command: '{{ redis_container_command }}'

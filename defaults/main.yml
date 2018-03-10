@@ -1,0 +1,19 @@
+redis_version: 4-alpine
+redis_data_dir: /var/lib/redis
+redis_config_dir: /opt/docker/services/redis
+redis_container_name: redis
+redis_container_command: redis-server /usr/local/etc/redis/redis.conf
+redis_published_ports: []
+redis_save:
+  - '900 1'
+  - '300 10'
+  - '60 10000'
+redis_tcp_keepalive: 300
+redis_tcp_backlog: 511
+redis_loglevel: notice
+redis_logfile: ''
+redis_databases: 16
+redis_timeout: 0
+redis_maxclients: 10000
+redis_maxmemory: false
+redis_maxmemory_policy: noeviction
