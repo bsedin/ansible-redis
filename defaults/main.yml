@@ -17,3 +17,4 @@ redis_timeout: 0
 redis_maxclients: 10000
 redis_maxmemory: false
 redis_maxmemory_policy: noeviction
+redis_ulimits: []
