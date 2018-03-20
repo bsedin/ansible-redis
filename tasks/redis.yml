@@ -17,12 +17,14 @@
   template:
     src: redis.conf.j2
     dest: '{{ redis_config_dir }}/redis.conf'
+  notify:
+    - reload redis
 
 - name: run host configuration container
   docker_container:
     state: started
     restart: yes
-    recreate: yes
+    recreate: no
     name: redis-host-sys-flags
     image: alpine
     detach: no
@@ -39,8 +41,8 @@
 - name: run redis container
   docker_container:
     state: started
-    restart: yes
-    recreate: yes
+    restart: no
+    recreate: no
     name: '{{ redis_container_name }}'
     image: redis:{{ redis_version }}
     restart_policy: always
