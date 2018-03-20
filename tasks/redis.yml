@@ -49,6 +49,8 @@
     published_ports: '{{ redis_published_ports | default([]) }}'
     sysctls:
       net.core.somaxconn: '{{ redis_tcp_backlog }}'
+    links: '{{ redis_links }}'
+    networks: '{{ redis_networks }}'
     volumes:
       - '{{ redis_data_dir }}:/data'
       - '{{ redis_config_dir }}/redis.conf:/usr/local/etc/redis/redis.conf'

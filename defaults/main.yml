@@ -1,8 +1,11 @@
+---
 redis_version: 4-alpine
 redis_data_dir: /var/lib/redis
 redis_config_dir: /opt/docker/services/redis
 redis_container_name: redis
 redis_container_command: redis-server /usr/local/etc/redis/redis.conf
+redis_links: []
+redis_networks: []
 redis_published_ports: []
 redis_save:
   - '900 1'
