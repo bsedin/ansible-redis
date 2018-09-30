@@ -20,7 +20,18 @@
   notify:
     - reload redis
 
-- name: run host configuration container
+- name: set sysctls on host
+  sysctl:
+    name: '{{ item.key }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_items:
+    - key: vm.overcommit_memory
+      value: 1
+
+- name: disable hugepages with configuration container
   docker_container:
     state: started
     restart: yes
@@ -31,11 +42,9 @@
     interactive: no
     privileged: true
     volumes:
-      - /proc:/hostfs/proc
       - /sys:/hostfs/sys
     command: >
-      sh -c "echo 1 > /hostfs/proc/sys/vm/overcommit_memory &&
-             echo never > /hostfs/sys/kernel/mm/transparent_hugepage/enabled &&
+      sh -c "echo never > /hostfs/sys/kernel/mm/transparent_hugepage/enabled &&
              echo never > /hostfs/sys/kernel/mm/transparent_hugepage/defrag"
 
 - name: run redis container
