@@ -1,12 +1,22 @@
 ---
+redis_image: redis:{{ redis_version }}
 redis_version: 4-alpine
 redis_data_dir: /var/lib/redis
 redis_config_dir: /opt/docker/services/redis
 redis_container_name: redis
 redis_container_command: redis-server /usr/local/etc/redis/redis.conf
-redis_links: []
-redis_networks: []
-redis_published_ports: []
+redis_container_log_driver: ''
+redis_container_log_opt: ''
+redis_container_networks: []
+redis_container_published_ports: []
+redis_container_ulimits:
+  - nofile:65536:65536
+  - memlock:-1:-1
+redis_container_sysctls:
+  net.core.somaxconn: '{{ redis_tcp_backlog }}'
+redis_container_volumes:
+  - '{{ redis_data_dir }}:/data'
+  - '{{ redis_config_dir }}/redis.conf:/usr/local/etc/redis/redis.conf'
 redis_save:
   - '900 1'
   - '300 10'
@@ -20,4 +30,3 @@ redis_timeout: 0
 redis_maxclients: 10000
 redis_maxmemory: false
 redis_maxmemory_policy: noeviction
-redis_ulimits: []

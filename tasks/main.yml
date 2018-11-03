@@ -1,1 +1,65 @@
-- include: redis.yml
+---
+- name: ensure redis storage dir
+  file:
+    dest: '{{ item }}'
+    state: directory
+  with_items:
+    - '{{ redis_data_dir }}'
+
+- name: ensure redis config dir
+  file:
+    dest: '{{ item }}'
+    state: directory
+  with_items:
+    - '{{ redis_config_dir }}'
+
+- name: create redis config file
+  template:
+    src: redis.conf.j2
+    dest: '{{ redis_config_dir }}/redis.conf'
+  notify:
+    - reload redis
+
+- name: set sysctls on host
+  sysctl:
+    name: '{{ item.key }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_items:
+    - key: vm.overcommit_memory
+      value: 1
+
+- name: disable hugepages with configuration container
+  docker_container:
+    state: started
+    restart: yes
+    recreate: no
+    name: redis-host-sys-flags
+    image: alpine
+    detach: no
+    interactive: no
+    privileged: true
+    volumes:
+      - /sys:/hostfs/sys
+    command: >
+      sh -c "echo never > /hostfs/sys/kernel/mm/transparent_hugepage/enabled &&
+             echo never > /hostfs/sys/kernel/mm/transparent_hugepage/defrag"
+
+- name: run redis container
+  docker_container:
+    state: started
+    restart: no
+    recreate: no
+    name: '{{ redis_container_name }}'
+    image: '{{ redis_image }}'
+    restart_policy: always
+    published_ports: '{{ redis_container_published_ports | default([]) }}'
+    sysctls: '{{ redis_container_sysctls }}'
+    networks: '{{ redis_container_networks }}'
+    command: '{{ redis_container_command }}'
+    volumes: '{{ redis_container_volumes }}'
+    ulimits: '{{ redis_container_ulimits }}'
+    log_driver: '{{ redis_container_log_driver }}'
+    log_opt: '{{ redis_container_log_opt }}'
