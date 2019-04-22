@@ -6,7 +6,7 @@ redis_config_dir: /opt/docker/services/redis
 redis_container_name: redis
 redis_container_command: redis-server /usr/local/etc/redis/redis.conf
 redis_container_log_driver: ''
-redis_container_log_opt: ''
+redis_container_log_opt: {}
 redis_container_networks: []
 redis_container_published_ports: []
 redis_container_ulimits:
