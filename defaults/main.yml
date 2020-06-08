@@ -1,7 +1,7 @@
 ---
 redis_image: redis:{{ redis_version }}
-redis_version: 4-alpine
-redis_data_dir: /var/lib/redis
+redis_version: alpine
+redis_data_dir: /var/lib/redis/{{ redis_container_name }}
 redis_config_dir: /opt/docker/services/redis
 redis_container_name: redis
 redis_container_command: redis-server /usr/local/etc/redis/redis.conf
