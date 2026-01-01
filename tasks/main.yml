@@ -46,6 +46,7 @@
     command: >
       sh -c "echo never > /hostfs/sys/kernel/mm/transparent_hugepage/enabled &&
              echo never > /hostfs/sys/kernel/mm/transparent_hugepage/defrag"
+  when: redis_disable_hugepages
 
 - name: run redis container
   docker_container:

@@ -30,3 +30,4 @@ redis_timeout: 0
 redis_maxclients: 10000
 redis_maxmemory: false
 redis_maxmemory_policy: noeviction
+redis_disable_hugepages: true
